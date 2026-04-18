@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BAHA Heater Packet Notes</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --panel: #fffdf8;
+      --ink: #1d1b19;
+      --muted: #6a655e;
+      --line: #ddd2bf;
+      --accent: #b6522f;
+      --accent-soft: #f6dfd4;
+      --good: #285943;
+      --good-soft: #dff0e7;
+      --warn: #8a5c14;
+      --warn-soft: #f8ebcb;
+      --mono: "Consolas", "SFMono-Regular", "Liberation Mono", monospace;
+      --sans: "Segoe UI", "Noto Sans", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, #fff7ef 0, transparent 32rem),
+        linear-gradient(180deg, #f7f1e8 0%, var(--bg) 100%);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 32px 20px 56px;
+    }
+
+    .hero,
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(61, 45, 24, 0.06);
+    }
+
+    .hero {
+      padding: 28px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 12px;
+      line-height: 1.15;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      margin-top: 10px;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+      margin-bottom: 14px;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    .lede {
+      max-width: 60rem;
+      color: #2b2722;
+      font-size: 1.02rem;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff7f0;
+      font-size: 0.92rem;
+    }
+
+    .chip strong {
+      color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .card {
+      padding: 22px;
+      margin-top: 18px;
+    }
+
+    .mono,
+    code,
+    pre,
+    table code {
+      font-family: var(--mono);
+    }
+
+    code {
+      background: #f8f3eb;
+      padding: 0.12rem 0.35rem;
+      border-radius: 6px;
+    }
+
+    pre {
+      margin: 12px 0 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid #e5dbc8;
+      background: #fbf7f1;
+      color: #2b241d;
+      font-size: 0.93rem;
+    }
+
+    .note,
+    .good,
+    .warn {
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-top: 14px;
+    }
+
+    .note {
+      background: #f6efe6;
+      border: 1px solid #e3d7c7;
+    }
+
+    .good {
+      background: var(--good-soft);
+      border: 1px solid #b8dcc8;
+    }
+
+    .warn {
+      background: var(--warn-soft);
+      border: 1px solid #ead39b;
+    }
+
+    ul {
+      margin: 10px 0 0 18px;
+      padding: 0;
+    }
+
+    li + li {
+      margin-top: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      border-top: 1px solid var(--line);
+      padding: 10px 10px 10px 0;
+    }
+
+    th {
+      color: #473b30;
+      font-size: 0.84rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    tbody tr:first-child td,
+    tbody tr:first-child th {
+      border-top: 1px solid var(--line);
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #d26e47, #b6522f);
+      flex: 0 0 auto;
+    }
+
+    .footer {
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        padding: 18px 14px 32px;
+      }
+
+      .hero,
+      .card {
+        padding: 18px;
+        border-radius: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">Samsung BAHA / Honeywell MC200-50</div>
+      <h1>Heater Packet Notes</h1>
+      <p class="lede">
+        This document is a human-readable summary of the RS485 heater packets currently mapped on the BAHA home network.
+        It records the confirmed heater frame meanings, room mapping, and working control writes.
+      </p>
+      <div class="chips">
+        <span class="chip"><strong>Node</strong> <code>40 90</code></span>
+        <span class="chip"><strong>UART</strong> <code>9600 8N1</code></span>
+        <span class="chip"><strong>Checksum</strong> XOR of payload bytes</span>
+        <span class="chip"><strong>Known Actions</strong> Away / Clear Away / Set Temperature</span>
+      </div>
+    </section>
+
+    <section class="grid two">
+      <article class="card">
+        <h2 class="section-title">What Is Proven</h2>
+        <ul>
+          <li>The heater-related BAHA node is <code>40 90</code>.</li>
+          <li><code>01 -&gt; 81</code> is a poll/response pair for the 5-room current-temperature table.</li>
+          <li><code>05 -&gt; 85</code> is a poll/response pair for the 5-room target-setpoint table.</li>
+          <li><code>02 06 00 ...</code> is a real action family.</li>
+          <li>A one-hot <code>C0</code> in a room slot sets that room to away / frost-protect mode.</li>
+          <li>A one-hot <code>80</code> in a room slot clears away on all five confirmed room slots.</li>
+          <li>A normal-coded room byte such as <code>95</code> sets that room's normal target temperature when <code>T0=00</code>, and from away it also exits away in one step.</li>
+          <li><code>T0=02</code> is a restore-to-stored-setpoint control for away rooms and has no observed effect once the room is already normal.</li>
+          <li><code>02 40 90 80 00 52 00</code> behaves like a generic receipt / ACK for the action family.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2 class="section-title">Final Conclusions</h2>
+        <ul>
+          <li>The <code>81</code> table is the current measured-temperature table.</li>
+          <li>The <code>85</code> table is the target setpoint table.</li>
+          <li>Reply subtype <code>02</code> means not-all-away, and subtype <code>03</code> means all rooms away.</li>
+          <li>The heater write path is fully exposed on <code>40 90</code> with room-specific <code>02 06 ...</code> action frames.</li>
+        </ul>
+      </article>
+    </section>
+
+    <article class="card">
+      <h2 class="section-title">Frame Shape</h2>
+      <p>All observed heater packets use the same framing style:</p>
+      <pre>02 [node_hi] [node_lo] [opcode] [payload...] [xor_checksum] 00</pre>
+      <table>
+        <thead>
+          <tr>
+            <th>Byte</th>
+            <th>Meaning</th>
+            <th>Observed Heater Values</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>00</code></td>
+            <td>Start byte</td>
+            <td><code>02</code></td>
+          </tr>
+          <tr>
+            <td><code>01 02</code></td>
+            <td>Node / function</td>
+            <td><code>40 90</code></td>
+          </tr>
+          <tr>
+            <td><code>03</code></td>
+            <td>Opcode</td>
+            <td><code>01</code>, <code>05</code>, <code>02</code>, <code>81</code>, <code>85</code>, <code>80</code></td>
+          </tr>
+          <tr>
+            <td>Last-1</td>
+            <td>XOR checksum</td>
+            <td>Computed over all bytes from the first <code>02</code> through the last payload byte</td>
+          </tr>
+          <tr>
+            <td>Last</td>
+            <td>End byte</td>
+            <td><code>00</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="note">
+        Example checksum: for <code>02 40 90 05 00 D7 00</code>, the checksum is
+        <code>02 ^ 40 ^ 90 ^ 05 ^ 00 = D7</code>.
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="section-title">Room Slot Mapping</h2>
+      <p>This is the confirmed room order for the five heater bytes:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Slot</th>
+            <th>Room</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>1</code></td>
+            <td>Living room</td>
+              <td>Confirmed</td>
+          </tr>
+          <tr>
+            <td><code>2</code></td>
+            <td>Master bedroom</td>
+              <td>Confirmed</td>
+          </tr>
+          <tr>
+            <td><code>3</code></td>
+            <td>Playroom</td>
+              <td>Confirmed</td>
+          </tr>
+          <tr>
+            <td><code>4</code></td>
+            <td>Study</td>
+              <td>Confirmed</td>
+          </tr>
+          <tr>
+            <td><code>5</code></td>
+            <td>Kids bedroom</td>
+              <td>Confirmed</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="small">
+        This ordering matches the Honeywell / KOCOM five-room model and the later away, clear-away, and direct setpoint tests across all five slots.
+      </p>
+    </article>
+
+    <section class="grid two">
+      <article class="card">
+        <h2 class="section-title">Read Packets</h2>
+        <h3>Current-temperature table poll</h3>
+        <pre>02 40 90 01 00 D3 00</pre>
+        <h3>Setpoint table poll</h3>
+        <pre>02 40 90 05 00 D7 00</pre>
+        <h3>Typical replies</h3>
+        <pre>02 40 90 81 06 02 97 96 95 96 95 C0 00
+02 40 90 85 06 02 93 94 94 94 88 DC 00</pre>
+      </article>
+
+    <article class="card">
+      <h2 class="section-title">Reply Field Meaning</h2>
+      <div class="good">
+        A BAHA heater reference provided later matches the opcode families exactly and labels the payload as
+        <code>DL</code> plus a sequence of <code>Tn</code> bytes used for mode and temperature.
+        For this controller, the captures still show <code>DL=06</code>, which means the practical payload is
+        <code>T0..T5</code>, not <code>T0..T7</code>.
+      </div>
+      <table>
+          <thead>
+            <tr>
+              <th>Byte</th>
+              <th>Meaning</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>03</code></td>
+              <td>Reply opcode</td>
+              <td><code>81</code> for current-temperature table, <code>85</code> for setpoint table</td>
+            </tr>
+            <tr>
+              <td><code>04</code></td>
+              <td>Length / subtype marker</td>
+              <td>Always observed as <code>06</code> on heater replies</td>
+            </tr>
+            <tr>
+              <td><code>05</code></td>
+              <td><code>T0</code> mode / subtype byte</td>
+              <td><code>02</code> in normal or mixed state, <code>03</code> when all rooms are away</td>
+            </tr>
+            <tr>
+              <td><code>06-10</code></td>
+              <td><code>T1..T5</code> room values</td>
+              <td>Slot order shown above</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+    </section>
+
+    <article class="card">
+      <h2 class="section-title">Value Legend</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Value</th>
+            <th>Meaning</th>
+            <th>How To Read It</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>93</code></td>
+            <td>Normal setpoint 19 C</td>
+            <td><code>0x93 - 0x80 = 19</code></td>
+          </tr>
+          <tr>
+            <td><code>94</code></td>
+            <td>Normal setpoint 20 C</td>
+            <td><code>0x94 - 0x80 = 20</code></td>
+          </tr>
+          <tr>
+            <td><code>95</code></td>
+            <td>Normal-coded 21 C</td>
+            <td>Current temperature in the <code>81</code> table</td>
+          </tr>
+          <tr>
+            <td><code>96</code></td>
+            <td>Normal-coded 22 C</td>
+            <td>Current temperature in the <code>81</code> table</td>
+          </tr>
+          <tr>
+            <td><code>97</code></td>
+            <td>Normal-coded 23 C</td>
+            <td>Current temperature in the <code>81</code> table</td>
+          </tr>
+          <tr>
+            <td><code>CA</code></td>
+            <td>Away setpoint 10 C</td>
+            <td><code>0xCA - 0xC0 = 10</code></td>
+          </tr>
+          <tr>
+            <td><code>D5</code></td>
+            <td>Away-coded 21 C</td>
+            <td><code>0xD5 - 0xC0 = 21</code></td>
+          </tr>
+          <tr>
+            <td><code>D6</code></td>
+            <td>Away-coded 22 C</td>
+            <td><code>0xD6 - 0xC0 = 22</code></td>
+          </tr>
+          <tr>
+            <td><code>D7</code></td>
+            <td>Away-coded 23 C</td>
+            <td><code>0xD7 - 0xC0 = 23</code></td>
+          </tr>
+          <tr>
+            <td><code>02</code></td>
+            <td>Normal / mixed-mode subtype</td>
+            <td>Seen in replies when not all rooms are away</td>
+          </tr>
+          <tr>
+            <td><code>03</code></td>
+            <td>All-away subtype</td>
+            <td>Seen in replies when every room was away</td>
+          </tr>
+          <tr>
+            <td><code>C0</code></td>
+            <td>Away action marker</td>
+            <td>Placed in exactly one room slot inside the action frame</td>
+          </tr>
+          <tr>
+            <td><code>80</code></td>
+            <td>Clear-away marker</td>
+            <td>Placed in exactly one room slot inside the action frame</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="good">
+        The simplest working rule is: normal-coded room values are <code>0x80 + tempC</code>, and away-coded room values are <code>0xC0 + tempC</code>.
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="section-title">Action Packet Family</h2>
+      <p>The first clearly state-changing heater command family is:</p>
+      <pre>02 40 90 02 06 00 [slot1] [slot2] [slot3] [slot4] [slot5] [chk] 00</pre>
+      <table>
+        <thead>
+          <tr>
+            <th>Byte</th>
+            <th>Meaning</th>
+            <th>Known Values</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>03</code></td>
+            <td>Action opcode</td>
+            <td><code>02</code></td>
+          </tr>
+          <tr>
+            <td><code>04</code></td>
+            <td>Action family / length marker</td>
+            <td><code>06</code></td>
+          </tr>
+          <tr>
+            <td><code>05</code></td>
+            <td>Leading action byte</td>
+            <td>Always observed as <code>00</code> so far</td>
+          </tr>
+          <tr>
+            <td><code>06-10</code></td>
+            <td>One room slot per byte</td>
+            <td>One-hot <code>C0</code> or <code>80</code>, all others <code>00</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Away examples</h3>
+      <pre>02 40 90 02 06 00 C0 00 00 00 00 16 00
+02 40 90 02 06 00 00 C0 00 00 00 16 00
+02 40 90 02 06 00 00 00 C0 00 00 16 00
+02 40 90 02 06 00 00 00 00 C0 00 16 00
+02 40 90 02 06 00 00 00 00 00 C0 16 00</pre>
+      <h3>Clear-away examples</h3>
+      <pre>02 40 90 02 06 00 80 00 00 00 00 56 00
+02 40 90 02 06 00 00 80 00 00 00 56 00
+02 40 90 02 06 00 00 00 80 00 00 56 00
+02 40 90 02 06 00 00 00 00 80 00 56 00
+02 40 90 02 06 00 00 00 00 00 80 56 00</pre>
+      <h3>Controller receipt</h3>
+      <pre>02 40 90 80 00 52 00</pre>
+    </article>
+
+    <section class="grid two">
+      <article class="card">
+        <h2 class="section-title">Known Working Commands</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Room</th>
+              <th>Away</th>
+              <th>Normal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Living room</td>
+              <td><code>02 40 90 02 06 00 C0 00 00 00 00 16 00</code></td>
+              <td><code>02 40 90 02 06 00 80 00 00 00 00 56 00</code></td>
+            </tr>
+            <tr>
+              <td>Master bedroom</td>
+              <td><code>02 40 90 02 06 00 00 C0 00 00 00 16 00</code></td>
+              <td><code>02 40 90 02 06 00 00 80 00 00 00 56 00</code></td>
+            </tr>
+            <tr>
+              <td>Playroom</td>
+              <td><code>02 40 90 02 06 00 00 00 C0 00 00 16 00</code></td>
+              <td><code>02 40 90 02 06 00 00 00 80 00 00 56 00</code></td>
+            </tr>
+            <tr>
+              <td>Study</td>
+              <td><code>02 40 90 02 06 00 00 00 00 C0 00 16 00</code></td>
+              <td><code>02 40 90 02 06 00 00 00 00 80 00 56 00</code></td>
+            </tr>
+            <tr>
+              <td>Kids bedroom</td>
+              <td><code>02 40 90 02 06 00 00 00 00 00 C0 16 00</code></td>
+              <td><code>02 40 90 02 06 00 00 00 00 00 80 56 00</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="card">
+        <h2 class="section-title">Worked Examples</h2>
+        <h3>Normal state</h3>
+        <pre>81: 02 40 90 81 06 02 97 96 95 96 95 C0 00
+85: 02 40 90 85 06 02 93 94 94 94 88 DC 00</pre>
+        <p class="small">
+          Read as: current temperatures <code>23, 22, 21, 22, 21</code> and setpoints
+          <code>19, 20, 20, 20, 8?</code>.
+        </p>
+        <h3>After putting one room into away</h3>
+        <pre>81: 02 40 90 81 06 02 97 96 95 D6 95 80 00
+85: 02 40 90 85 06 02 93 94 94 CA 88 82 00</pre>
+        <p class="small">
+          The fourth room changed from normal-coded values to away-coded values.
+        </p>
+        <h3>All rooms in away</h3>
+        <pre>81: 02 40 90 81 06 03 D7 D6 D5 D6 D5 81 00
+85: 02 40 90 85 06 03 CA CA CA CA CA 98 00</pre>
+      </article>
+    </section>
+
+    <article class="card">
+      <h2 class="section-title">What The Heater Means By "Off"</h2>
+      <p>
+        On this system, the user-visible heater "off" behavior does not currently look like a separate hard-off binary state.
+        It behaves much more like <strong>away / frost-protect at 10 C</strong>.
+      </p>
+      <div class="good">
+        Practical rule: if the wallpad says "off", the BAHA-side packets currently look like "away 10 C", not "output completely disabled with no temperature target".
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="section-title">Earlier Failed Write Guesses</h2>
+      <p>Several direct write guesses were tested and failed to change the <code>85</code> setpoint table.</p>
+      <pre>02 40 90 06 03 02 01 93 47 00
+02 40 90 06 03 02 02 93 44 00
+02 40 90 04 03 02 01 93 45 00
+02 40 90 07 03 02 02 93 45 00
+02 40 90 06 06 02 93 93 94 94 88 58 00</pre>
+      <ul>
+        <li><code>06</code> often triggered an immediate <code>85</code> readback but no state change.</li>
+        <li><code>04</code> and <code>07</code> did not produce useful state changes.</li>
+        <li>That makes a simple direct bulk write to <code>40 90</code> unlikely.</li>
+      </ul>
+    </article>
+
+    <article class="card">
+      <h2 class="section-title">Confirmed Temperature-Set Write</h2>
+      <div class="good">
+        <strong>Confirmed working format:</strong>
+        <pre>02 40 90 02 06 00 [room1] [room2] [room3] [room4] [room5] [chk] 00</pre>
+        where a non-zero room byte sets that room's normal setpoint and a zero byte leaves that room unchanged.
+      </div>
+      <p>
+        The room byte uses the same normal temperature encoding already seen in the <code>85</code> setpoint table:
+      </p>
+      <pre>encoded_setpoint = 0x80 + temperature_celsius</pre>
+      <h3>Confirmed master-bedroom examples</h3>
+      <pre>20 C = 02 40 90 02 06 00 00 94 00 00 00 42 00
+21 C = 02 40 90 02 06 00 00 95 00 00 00 43 00</pre>
+      <h3>Observed proof</h3>
+      <pre>before : 02 40 90 85 06 02 93 94 94 94 88 DC 00
+write  : 02 40 90 02 06 00 00 95 00 00 00 43 00
+ack    : 02 40 90 80 00 52 00
+after  : 02 40 90 85 06 02 93 95 94 94 88 DD 00</pre>
+      <p class="small">
+        That changed the master bedroom from <code>20 C</code> to <code>21 C</code>. Sending
+        <code>02 40 90 02 06 00 00 94 00 00 00 42 00</code> then changed it back to <code>20 C</code>.
+      </p>
+      <h3>What T0 appears to mean now</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Value</th>
+            <th>Current Interpretation</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>T0=00</code></td>
+            <td>Working action/write path for away, clear-away, and normal setpoint changes</td>
+            <td>Confirmed</td>
+          </tr>
+          <tr>
+            <td><code>T0=02</code></td>
+            <td>Not a direct normal setpoint write. On tested rooms it restored an away room to its stored normal setpoint and ignored the supplied temperature; once already normal it had no observed effect.</td>
+            <td>Confirmed in live tests</td>
+          </tr>
+          <tr>
+            <td><code>T0=03</code></td>
+            <td>All-away reply subtype in read responses</td>
+            <td>Confirmed in replies</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Best sequence if the room is currently away</h3>
+      <pre>restore stored normal setpoint: 02 40 90 02 06 00 00 80 00 00 00 56 00
+set a new 20 C target directly: 02 40 90 02 06 00 00 94 00 00 00 42 00</pre>
+      <div class="good">
+        The live tests closed the heater-side protocol questions: room order, current table, away subtype, clear-away behavior, and direct setpoint writes are all confirmed.
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="section-title">18-25 C Quick Command Table</h2>
+      <p>
+        These are the direct normal setpoint writes for the five rooms. Each frame follows the confirmed format
+        <code>02 40 90 02 06 00 ...</code>, with one room byte set to <code>0x80 + tempC</code> and the others left at <code>00</code>.
+      </p>
+      <div class="grid two">
+        <div>
+          <h3>Living Room</h3>
+          <pre>18 C = 02 40 90 02 06 00 92 00 00 00 00 44 00
+19 C = 02 40 90 02 06 00 93 00 00 00 00 45 00
+20 C = 02 40 90 02 06 00 94 00 00 00 00 42 00
+21 C = 02 40 90 02 06 00 95 00 00 00 00 43 00
+22 C = 02 40 90 02 06 00 96 00 00 00 00 40 00
+23 C = 02 40 90 02 06 00 97 00 00 00 00 41 00
+24 C = 02 40 90 02 06 00 98 00 00 00 00 4E 00
+25 C = 02 40 90 02 06 00 99 00 00 00 00 4F 00</pre>
+        </div>
+        <div>
+          <h3>Master Bedroom</h3>
+          <pre>18 C = 02 40 90 02 06 00 00 92 00 00 00 44 00
+19 C = 02 40 90 02 06 00 00 93 00 00 00 45 00
+20 C = 02 40 90 02 06 00 00 94 00 00 00 42 00
+21 C = 02 40 90 02 06 00 00 95 00 00 00 43 00
+22 C = 02 40 90 02 06 00 00 96 00 00 00 40 00
+23 C = 02 40 90 02 06 00 00 97 00 00 00 41 00
+24 C = 02 40 90 02 06 00 00 98 00 00 00 4E 00
+25 C = 02 40 90 02 06 00 00 99 00 00 00 4F 00</pre>
+        </div>
+        <div>
+          <h3>Playroom</h3>
+          <pre>18 C = 02 40 90 02 06 00 00 00 92 00 00 44 00
+19 C = 02 40 90 02 06 00 00 00 93 00 00 45 00
+20 C = 02 40 90 02 06 00 00 00 94 00 00 42 00
+21 C = 02 40 90 02 06 00 00 00 95 00 00 43 00
+22 C = 02 40 90 02 06 00 00 00 96 00 00 40 00
+23 C = 02 40 90 02 06 00 00 00 97 00 00 41 00
+24 C = 02 40 90 02 06 00 00 00 98 00 00 4E 00
+25 C = 02 40 90 02 06 00 00 00 99 00 00 4F 00</pre>
+        </div>
+        <div>
+          <h3>Study</h3>
+          <pre>18 C = 02 40 90 02 06 00 00 00 00 92 00 44 00
+19 C = 02 40 90 02 06 00 00 00 00 93 00 45 00
+20 C = 02 40 90 02 06 00 00 00 00 94 00 42 00
+21 C = 02 40 90 02 06 00 00 00 00 95 00 43 00
+22 C = 02 40 90 02 06 00 00 00 00 96 00 40 00
+23 C = 02 40 90 02 06 00 00 00 00 97 00 41 00
+24 C = 02 40 90 02 06 00 00 00 00 98 00 4E 00
+25 C = 02 40 90 02 06 00 00 00 00 99 00 4F 00</pre>
+        </div>
+        <div>
+          <h3>Kids Bedroom</h3>
+          <pre>18 C = 02 40 90 02 06 00 00 00 00 00 92 44 00
+19 C = 02 40 90 02 06 00 00 00 00 00 93 45 00
+20 C = 02 40 90 02 06 00 00 00 00 00 94 42 00
+21 C = 02 40 90 02 06 00 00 00 00 00 95 43 00
+22 C = 02 40 90 02 06 00 00 00 00 00 96 40 00
+23 C = 02 40 90 02 06 00 00 00 00 00 97 41 00
+24 C = 02 40 90 02 06 00 00 00 00 00 98 4E 00
+25 C = 02 40 90 02 06 00 00 00 00 00 99 4F 00</pre>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="section-title">Confirmed Setpoint Limits</h2>
+      <p>
+        The master bedroom was used to test the numeric limits of the direct setpoint write path. The accepted range is now confirmed as
+        <strong>5 C through 35 C</strong>.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Test</th>
+            <th>Write</th>
+            <th>Observed Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>5 C</code></td>
+            <td><code>02 40 90 02 06 00 00 85 00 00 00 53 00</code></td>
+            <td>Accepted. Readback changed to master <code>85</code>, meaning <code>5 C</code>.</td>
+          </tr>
+          <tr>
+            <td><code>4 C</code></td>
+            <td><code>02 40 90 02 06 00 00 84 00 00 00 52 00</code></td>
+            <td>Rejected logically. ACK returned, but the setpoint stayed at <code>5 C</code>.</td>
+          </tr>
+          <tr>
+            <td><code>35 C</code></td>
+            <td><code>02 40 90 02 06 00 00 A3 00 00 00 75 00</code></td>
+            <td>Accepted. Readback changed to master <code>A3</code>, meaning <code>35 C</code>.</td>
+          </tr>
+          <tr>
+            <td><code>36 C</code></td>
+            <td><code>02 40 90 02 06 00 00 A4 00 00 00 72 00</code></td>
+            <td>Rejected logically. ACK returned, but the setpoint stayed at <code>35 C</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="good">
+        Practical limit rule: the controller will acknowledge out-of-range writes with the usual
+        <code>02 40 90 80 00 52 00</code>, but the <code>85</code> setpoint table will not move past <code>5 C</code> or <code>35 C</code>.
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="section-title">Status</h2>
+      <ul>
+        <li>The heater packet map is complete enough for practical control and monitoring.</li>
+        <li>The documented commands cover away, clear-away, polling, and direct room setpoint writes.</li>
+        <li>The remaining exploratory items in the workspace are now outside the heater packet mapping itself.</li>
+      </ul>
+    </article>
+
+    <p class="footer">
+      Source notes live in <a href="protocol.md">protocol.md</a>. This HTML file is intended as the easier reading version for manual protocol reasoning.
+    </p>
+  </main>
+</body>
+</html>

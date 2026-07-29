@@ -964,6 +964,60 @@ Current conclusion:
 - writes outside that range still receive the generic `02 40 90 80 00 52 00` receipt
 - but the setpoint table does not change beyond the nearest valid limit
 
+### 2026-07-29/30 Playroom Away Bit and Direct-Value Write
+
+A live capture on 2026-07-29 and an ESPHome round-trip test after midnight on 2026-07-30 isolated the playroom slot while the other four rooms remained unchanged.
+
+Normal baseline:
+
+```text
+81: 02 40 90 81 06 02 A1 9E A0 A0 9F F7 00
+85: 02 40 90 85 06 02 92 95 93 85 91 D3 00
+```
+
+Playroom away:
+
+```text
+81: 02 40 90 81 06 02 A1 9E E0 A0 9F B7 00
+85: 02 40 90 85 06 02 92 95 CA 85 91 8A 00
+```
+
+The playroom values decode as:
+
+```text
+current: A0 -> E0 = 32 C in both modes, with bit 0x40 added in away
+target : 93 -> CA = normal 19 C -> away 10 C
+```
+
+This gives a direct decoder for both the `81` and `85` tables:
+
+```text
+temperature_celsius = value & 0x3F
+away                 = (value & 0x40) != 0
+```
+
+Subtracting only `0x80` is incorrect for away-coded bytes because it leaves the `0x40` flag in the numeric temperature and creates a `+64 C` error.
+
+The ESPHome test emitted this direct away-coded value for the playroom slot:
+
+```text
+02 40 90 02 06 00 00 00 CA 00 00 1C 00
+```
+
+The controller accepted the frame, and readback changed to `E0` / `CA`. This adds an important nuance to the earlier command model:
+
+- one-hot `C0` remains the wallpad-originated and actively verified away action marker
+- `CA` is also accepted as a direct playroom away write on this installation
+- only `CA` (`10 C`) was tested this way; acceptance of arbitrary `0xC0 | temperature` writes is not yet proven
+
+The return-to-normal test explicitly restored the prior playroom target of `19 C`:
+
+```text
+02 40 90 02 06 00 00 00 93 00 00 45 00
+```
+
+Readback returned to `A0` / `93`, while all other room slots retained their previous values.
+
 ## Related Protocol Reference: Samsung SDS Homenet
 
 There is public community reverse-engineering material for older Samsung SDS Homenet / EasyOn wallpads.

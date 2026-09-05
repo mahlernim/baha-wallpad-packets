@@ -1,68 +1,55 @@
-# BAHA 월패드 패킷 문서
+# BAHA 월패드 지식베이스
 
-빠른 이동: [프로토콜 개요](docs/protocol-overview.md) | [하드웨어](docs/hardware.md) | [거실 조명 `10 04`](docs/lighting-node-10-04.md) | [현관 / 일괄소등 `1F 0F`](docs/master-switch-node-1f0f.md) | [난방 `40 90`](docs/heater-node-40-90.md) | [ESPHome 구현 저장소](docs/esphome-external-component.md) | [참고 자료](reference/README.md)
+빠른 이동: [지식 지도](docs/knowledge-map.md) | [프로토콜 개요](docs/protocol-overview.md) | [공개 출처 목록](reference/sources.md) | [미확인 사항](docs/open-questions.md) | [자료 기여](CONTRIBUTING.md)
 
-삼성중공업 BAHA `BHWP-2711C/A` 월패드의 RS485 패킷을 실측 캡처와 능동 테스트로 정리한 문서 저장소다.
+삼성중공업 BAHA 월패드의 모델 정보, RS485 패킷, 난방 설명서와 공개 구현을 정리한다. `BHWP-2711C/A`의 실측을 중심으로, 다른 모델의 자료에는 출처와 확인 범위를 함께 표시한다.
 
-이 계열 월패드는 공개 자료가 거의 없어서, 실제 설치 환경에서 확인한 패킷 형식, 노드 역할, 제어 동작을 재사용 가능한 형태로 남기는 것이 목적이다.
+**자료 확인일: 2026-09-05** · [출처 목록](reference/sources.md) · [검색 범위](reference/search-coverage.md)
 
-![월패드 라벨](assets/images/wallpad-label.jpg)
-
-## 빠른 요약
-
-현재 정리된 주요 노드:
+## 확인된 패킷
 
 | 노드 | 용도 | 상태 |
 | --- | --- | --- |
-| `10 04` | 거실 4채널 조명 | 매핑 완료 |
-| `10 06` | 타 설치 사례의 6채널 조명 | 패턴 확인 |
-| `1F 0F` | 현관 / 일괄소등 스위치 상태 제어 | 실사용 기준으로 정리 완료 |
-| `40 90` | 난방 상태 / 제어 | 매핑 완료 |
+| [`10 04`](docs/lighting-node-10-04.md) | 4채널 조명 | 상태 응답과 제어 동작 실측 |
+| [`10 06`](docs/lighting-node-10-04.md) | 6채널 조명 | 외부 작성자의 쓰기 명령; 조회·응답 미확인 |
+| [`1F 0F`](docs/master-switch-node-1f0f.md) | 현관·일괄소등 | 상태 응답과 제어 동작 실측; 내부 역할 미확인 |
+| [`40 90`](docs/heater-node-40-90.md) | 난방 | 5개 방 슬롯의 온도·외출 상태와 쓰기 실측 |
+| `30 80`, `31 80` | 역할 미확인 | 반복 조회 프레임만 관찰 |
 
-버스 설정:
+실측 버스의 기본 형식:
 
 | 항목 | 값 |
 | --- | --- |
 | UART | `9600 8N1` |
-| 체크섬 | 페이로드 전체 XOR |
+| 프레임 길이 | 데이터 길이 `DL` + 7바이트 |
+| 체크섬 | 시작 `02`부터 데이터 끝까지 XOR |
 | 종료 바이트 | `00` |
 
-조명 노드에 대해서는 다음 일반 규칙이 확인됐다.
+조명은 비트마스크로 제어한다. 예를 들어 4채널의 capability는 `0F`로, 채널 수를 나타내는 노드 바이트 `04`와 다르다. 자세한 형식과 6채널의 확인 범위는 [조명 문서](docs/lighting-node-10-04.md)를 참고한다.
 
-- `10 xx` 계열 조명 노드는 `01 -> 81` 조회 / 상태 응답과 `02 02` 마스크 쓰기를 사용한다.
-- `node_lo` 바이트는 해당 노드의 조명 채널 수와 일치한다.
-- 상태 응답의 고정 capability 바이트도 같은 값을 사용한다.
-- 단일 조명 제어는 `1, 2, 4, 8, ...` 식의 비트마스크로 표현된다.
-- 켜기는 `<value_mask> = <channel_mask>`, 끄기는 `<value_mask> = 00` 이다.
+## 읽을 거리
 
-## 문서 구성
+| 목적 | 문서 |
+| --- | --- |
+| 모델과 제품 계보 확인 | [모델 식별표](docs/model-family.md), [실물 라벨·PCB 사진](docs/hardware.md) |
+| 패킷 구조와 체크섬 이해 | [프로토콜 개요](docs/protocol-overview.md) |
+| 난방 장치의 연결과 모드 비교 | [난방 시스템](docs/heating-system.md) |
+| ESPHome 구현 검토 | [지원 범위와 알려진 차이](docs/esphome-external-component.md) |
+| 원문과 실측 근거 확인 | [출처 목록](reference/sources.md), [과거 조사 기록](reference/README.md) |
+| 다른 주제 찾기·자료 추가 | [지식 지도](docs/knowledge-map.md), [미확인 사항](docs/open-questions.md), [기여 안내](CONTRIBUTING.md) |
 
-- [docs/protocol-overview.md](docs/protocol-overview.md): 버스 프레이밍, 설정값, 확인된 노드 요약
-- [docs/hardware.md](docs/hardware.md): 하드웨어 식별 정보와 캡처 환경 사진
-- [docs/lighting-node-10-04.md](docs/lighting-node-10-04.md): 거실 조명 프로토콜
-- [docs/master-switch-node-1f0f.md](docs/master-switch-node-1f0f.md): 현관 / 일괄소등 스위치 노드
-- [docs/heater-node-40-90.md](docs/heater-node-40-90.md): 난방 프로토콜과 검증된 제어 패킷
-- [docs/esphome-external-component.md](docs/esphome-external-component.md): 별도 ESPHome 구현 저장소 안내
-- [reference/README.md](reference/README.md): 원본 조사 로그와 HTML 참고 자료
+## 적용 범위
 
-## 시험 하드웨어 한눈에 보기
+실측 결과는 한 설치 환경에서 확인한 동작이다. 모델·펌웨어·배선에 따라 차이가 있을 수 있으며, 제품 소개의 지원 기능만으로 특정 패킷의 동작을 판단할 수는 없다. 각 문서에서 실측, 외부 제보, 제품 자료와 추론을 구분한다.
 
-- 월패드 모델: `BHWP-2711C/A`
-- 라벨상 제조사: `삼성중공업(주) 수원사업장`
-- 캡처 어댑터: `bitbus` `USB TO RS485`, 보드 코드 `MFA-02`
-- PC 인식 USB 직렬 칩 계열: Silicon Labs `CP210x`
+공개 [ESPHome 컴포넌트](https://github.com/mahlernim/esphome-samsung-baha-rs485)는 별도 저장소에서 관리한다. 확인한 버전에는 난방 외출 온도 해석과 지원 채널 수의 제약이 있으므로 [구현 비교](docs/esphome-external-component.md)를 먼저 읽는다.
 
-![월패드 PCB](assets/images/wallpad-pcb-top.jpg)
+## 문서 검증
 
-## 문서 범위에 대한 메모
+Python 3.10 이상에서 실행한다. 문서 내부 링크와 완전한 패킷 예제의 길이·XOR를 검사하며, 장치나 네트워크에 접속하지 않는다.
 
-- 이 문서는 실제 1개 설치 환경에서 검증한 결과를 바탕으로 한다. 유사한 BAHA / 삼성중공업 월패드라도 펌웨어, 배선, 연결된 하위 시스템에 따라 차이가 있을 수 있다.
-- 본 저장소는 실측된 동작을 정리한 것이며, 제조사 공식 서비스 문서는 아니다.
-- ESPHome 구현은 별도 저장소 [`esphome-samsung-baha-rs485`](https://github.com/mahlernim/esphome-samsung-baha-rs485) 로 분리함. 이 저장소는 패킷 해석과 실측 근거를 중심으로 유지함.
+```sh
+python scripts/check_knowledgebase.py
+```
 
-## 다음 읽을 문서
-
-- 전체 버스 구조부터 보려면 [docs/protocol-overview.md](docs/protocol-overview.md)
-- 하드웨어 식별과 사진부터 보려면 [docs/hardware.md](docs/hardware.md)
-- 바로 제어 패킷을 보려면 [거실 조명](docs/lighting-node-10-04.md), [현관 / 일괄소등](docs/master-switch-node-1f0f.md), [난방](docs/heater-node-40-90.md)
-- ESPHome 구현을 보려면 [ESPHome 구현 저장소 안내](docs/esphome-external-component.md)
+검색 별칭: **BAHA · BaHa-Cube · 삼성중공업 · Samsung Heavy Industries · BHWP-2711 · BHWP-2711C/A · BAHA-W-2030A · RS485 · Honeywell MC200**

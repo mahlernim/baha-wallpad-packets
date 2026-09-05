@@ -1,5 +1,7 @@
 # Protocol Notes
 
+Historical research record. Some sections preserve intermediate hypotheses. Use the [current heater decoder](../docs/heater-node-40-90.md) for normal/Away values and the [model-specific manual comparison](../docs/heating-system.md) for thermostat topology, room counts, and Off/Away behavior. The LT200 manual's living room plus rooms 1–5 are six UI locations, not evidence of a universal five-slot BAHA layout.
+
 Curated docs: [README](../README.md) | [프로토콜 개요](../docs/protocol-overview.md) | [하드웨어](../docs/hardware.md) | [거실 조명](../docs/lighting-node-10-04.md) | [현관 / 일괄소등](../docs/master-switch-node-1f0f.md) | [난방](../docs/heater-node-40-90.md) | [참고 자료](README.md)
 
 ## Environment

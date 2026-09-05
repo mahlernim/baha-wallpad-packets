@@ -258,6 +258,12 @@
     <section class="hero">
       <div class="eyebrow">Samsung BAHA / Honeywell MC200-50</div>
       <h1>Heater Packet Notes</h1>
+      <p class="lede" role="note">
+        <strong>Historical reference.</strong> This page preserves an earlier interpretation.
+        Use the <a href="../docs/heater-node-40-90.md">current heater packet document</a>
+        for normal/Away bit decoding and the <a href="../docs/heating-system.md">manual comparison</a>
+        for model-specific room counts and Off/Away behavior.
+      </p>
       <p class="lede">
         This document is a human-readable summary of the RS485 heater packets currently mapped on the BAHA home network.
         It records the confirmed heater frame meanings, room mapping, and working control writes.
@@ -265,7 +271,7 @@
       <div class="chips">
         <span class="chip"><strong>Node</strong> <code>40 90</code></span>
         <span class="chip"><strong>UART</strong> <code>9600 8N1</code></span>
-        <span class="chip"><strong>Checksum</strong> XOR of payload bytes</span>
+        <span class="chip"><strong>Checksum</strong> XOR from initial 02 through data</span>
         <span class="chip"><strong>Known Actions</strong> Away / Clear Away / Set Temperature</span>
       </div>
     </section>

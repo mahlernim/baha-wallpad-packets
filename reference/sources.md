@@ -184,12 +184,12 @@
 
 <a id="s30"></a>
 
-### S30 · mahlernim/esphome-samsung-baha-rs485
+### S30 · mahlernim/esphome-samsung-baha-rs485 — 수정 전 f9dfed0
 
 - 원문: [README](https://github.com/mahlernim/esphome-samsung-baha-rs485/blob/f9dfed0b3806cecc10e8c323c0d61206ebb57789/README.md), [C++ 구현](https://github.com/mahlernim/esphome-samsung-baha-rs485/blob/f9dfed0b3806cecc10e8c323c0d61206ebb57789/components/baha_rs485/baha_rs485.cpp), [상수 / 기본값](https://github.com/mahlernim/esphome-samsung-baha-rs485/blob/f9dfed0b3806cecc10e8c323c0d61206ebb57789/components/baha_rs485/baha_rs485.h)
-- 작성자·버전: `mahlernim`, `f9dfed0b3806cecc10e8c323c0d61206ebb57789`, 2026-04-20. 확인일의 공개 main이며 코드 본문 확인.
-- 내용: 구현된 파서·엔티티 동작과 제약. [현재 패킷 문서와의 차이](../docs/esphome-external-component.md)를 함께 읽는다.
-- 참고: 같은 작성자의 구현으로, 독립적인 프로토콜 검증은 아니다. 외출 디코더는 후속 실측 [S40](#s40)과 일치하지 않으며, 이 커밋의 실제 장비 배포 여부도 별개다.
+- 작성자·버전: `mahlernim`, `f9dfed0b3806cecc10e8c323c0d61206ebb57789`, 2026-04-20. 초기 조사에서 확인한 공개 main의 코드 이력이다.
+- 내용: 수정 전 파서·엔티티 동작과 제약. [버전별 비교](../docs/esphome-external-component.md)와 수정 릴리스 [S35](#s35)를 함께 읽는다.
+- 참고: 이 커밋의 외출 디코더는 후속 실측 [S40](#s40)과 일치하지 않는다. 같은 작성자의 구현으로 독립적인 프로토콜 검증은 아니며, 실제 장비에 배포된 버전도 별개다.
 
 <a id="s31"></a>
 
@@ -226,6 +226,15 @@
 - 작성자·버전: `eigger`, `0028799461f2eefed8d4291def150a8733c5ae3a`, 2026-09-04. README의 대상 제품 표기 확인.
 - 내용: `Samsung` 폴더가 Samsung SDS를 가리키는 사례. 별도 HVAC 패키지와도 구분한다.
 - 참고: 전체 구현은 검증하지 않았으며 BAHA 호환성을 입증하는 자료도 아니다.
+
+<a id="s35"></a>
+
+### S35 · mahlernim/esphome-samsung-baha-rs485 — v0.1.1
+
+- 원문: [v0.1.1 릴리스](https://github.com/mahlernim/esphome-samsung-baha-rs485/releases/tag/v0.1.1), [해당 버전의 C++ 구현](https://github.com/mahlernim/esphome-samsung-baha-rs485/blob/97887e1a8417ff02387d56b7bbd4ca1e1eed8a97/components/baha_rs485/baha_rs485.cpp), [상수·기본값](https://github.com/mahlernim/esphome-samsung-baha-rs485/blob/97887e1a8417ff02387d56b7bbd4ca1e1eed8a97/components/baha_rs485/baha_rs485.h)
+- 작성자·버전: `mahlernim`, `v0.1.1`, 커밋 `97887e1a8417ff02387d56b7bbd4ca1e1eed8a97`. 2026-09-05 공개 릴리스와 소스 확인. 수정 전 분석은 [S30](#s30)에 보존했다.
+- 내용: 인코딩 온도를 하위 6비트로 읽고, 숫자상 목표온도가 같아도 필요한 외출→일반 설정 쓰기를 유지하는 수정. raw 바이트 fallback, 설정 스키마, 조명 4채널 지원, 난방 On / Off 델타는 유지한다.
+- 참고: 코드 수정의 근거이며 실제 장비의 펌웨어 업데이트나 다른 설치에서의 독립 재현을 뜻하지 않는다. 별도 외출 엔티티, 버너·밸브 피드백, 6채널 조명 지원을 추가한 릴리스도 아니다.
 
 <a id="s40"></a>
 

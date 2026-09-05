@@ -19,8 +19,10 @@
 | 환기·가스·커튼·승강기·인터폰 | 과거 제품 소개에 기능 언급 | 해당 BAHA 모델의 공식 프로토콜 또는 식별 가능한 공개 캡처 |
 | 현재 원격서비스 | 과거 웹 제어와 YPP / SKT 연동 발표 | 현행 서비스의 모델·설치별 공식 지원표 |
 
-## 공개 구현에서 확인한 후속 과제
+## 공개 구현의 수정과 남은 과제
 
-확인한 `mahlernim/esphome-samsung-baha-rs485` 버전에는 외출 온도 해석과 4채널 고정 지원의 제약이 있다. [구현 비교](esphome-external-component.md)에 소스 위치와 영향을 정리했다. 구현이 수정되면 새 커밋을 기준으로 해결 여부를 갱신한다.
+`mahlernim/esphome-samsung-baha-rs485`의 수정 전 `f9dfed0`에서 확인한 외출 온도 디코더 문제는 [v0.1.1](https://github.com/mahlernim/esphome-samsung-baha-rs485/releases/tag/v0.1.1)에 반영했다. 숫자상 목표온도가 같아도 외출에서 일반 설정으로 바꾸는 데 필요한 쓰기를 유지한다. [버전별 비교](esphome-external-component.md), [S35](../reference/sources.md#s35)
+
+조명의 4채널 고정 지원은 남아 있으며, 실제 장비에 이 릴리스가 적용되었는지는 별도 확인이 필요하다. 코드 수정과 다른 모델·설치에서의 독립 재현도 구분한다.
 
 새 근거를 추가할 때는 어떤 모델과 조건에서 결론이 달라지는지 [기여 안내](../CONTRIBUTING.md)에 따라 적는다.

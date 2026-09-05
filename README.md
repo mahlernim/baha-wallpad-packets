@@ -42,7 +42,7 @@
 
 실측 결과는 한 설치 환경에서 확인한 동작이다. 모델·펌웨어·배선에 따라 차이가 있을 수 있으며, 제품 소개의 지원 기능만으로 특정 패킷의 동작을 판단할 수는 없다. 각 문서에서 실측, 외부 제보, 제품 자료와 추론을 구분한다.
 
-공개 [ESPHome 컴포넌트](https://github.com/mahlernim/esphome-samsung-baha-rs485)는 별도 저장소에서 관리한다. 확인한 버전에는 난방 외출 온도 해석과 지원 채널 수의 제약이 있으므로 [구현 비교](docs/esphome-external-component.md)를 먼저 읽는다.
+공개 [ESPHome 컴포넌트](https://github.com/mahlernim/esphome-samsung-baha-rs485)는 별도 저장소에서 관리한다. [v0.1.1](https://github.com/mahlernim/esphome-samsung-baha-rs485/releases/tag/v0.1.1)은 이전 `f9dfed0`의 외출 온도 해석을 수정하고, 숫자상 목표온도가 같아도 필요한 외출 해제 요청을 보낸다. 조명은 계속 4채널만 지원하며, 지원 범위와 버전별 차이는 [구현 비교](docs/esphome-external-component.md)에 정리했다. 릴리스와 실제 장비의 펌웨어 업데이트 여부는 별개다.
 
 ## 문서 검증
 
